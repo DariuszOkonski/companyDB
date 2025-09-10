@@ -46,12 +46,29 @@ router.get('/products/:id', (req, res) => {
 
 router.post('/products', (req, res) => {
   const { name, client } = req.body;
-  db.products.push({ id: 3, name, client });
-  res.json({ message: 'OK' });
+
+  if (!name || !client) {
+    return res.status(400).json({ message: 'Missing data' });
+  }
+
+  return req.db
+    .collection('products')
+    .insertOne({ name, client })
+    .then(() => {
+      return res.json({ message: 'OK' });
+    })
+    .catch((err) => {
+      return res.status(500).json({ message: err });
+    });
 });
 
 router.put('/products/:id', (req, res) => {
   const { name, client } = req.body;
+
+  if (!name || !client) {
+    return res.status(400).json({ message: 'Missing data' });
+  }
+
   db = db.products.map((item) =>
     item.id == req.params.id ? { ...item, name, client } : item
   );
