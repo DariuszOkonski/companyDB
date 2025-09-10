@@ -5,7 +5,7 @@ const router = express.Router();
 const db = require('./../db');
 
 router.get('/products', (req, res) => {
-  req.db
+  return req.db
     .collection('products')
     .find()
     .toArray()
@@ -18,7 +18,16 @@ router.get('/products', (req, res) => {
 });
 
 router.get('/products/random', (req, res) => {
-  res.json(db.products[Math.floor(Math.random() * db.length)]);
+  return req.db
+    .collection('products')
+    .aggregate([{ $sample: { size: 1 } }])
+    .toArray()
+    .then((data) => {
+      res.json(data[0]);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err });
+    });
 });
 
 router.get('/products/:id', (req, res) => {

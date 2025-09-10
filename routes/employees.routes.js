@@ -3,7 +3,7 @@ const router = express.Router();
 const { ObjectId } = require('mongodb');
 
 router.get('/employees', (req, res) => {
-  req.db
+  return req.db
     .collection('employees')
     .find()
     .toArray()
