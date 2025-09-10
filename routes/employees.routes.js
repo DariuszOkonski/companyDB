@@ -37,6 +37,11 @@ router.get('/employees/:id', (req, res) => {
 
 router.post('/employees', (req, res) => {
   const { firstName, lastName } = req.body;
+
+  if (!firstName || !lastName) {
+    return res.status(400).json({ error: 'Missing required data in request' });
+  }
+
   db.employees.push({ id: 3, firstName, lastName });
   res.json({ message: 'OK' });
 });
