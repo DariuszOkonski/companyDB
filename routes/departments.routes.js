@@ -3,41 +3,41 @@ const router = express.Router();
 const { ObjectId } = require('mongodb');
 
 router.get('/departments', (req, res) => {
-  return req.db
+  req.db
     .collection('departments')
     .find()
     .toArray()
     .then((data) => {
-      res.json(data);
+      return res.json(data);
     })
     .catch((err) => {
-      res.status(500).json({ message: err });
+      return res.status(500).json({ message: err });
     });
 });
 
 router.get('/departments/random', (req, res) => {
-  return req.db
+  req.db
     .collection('departments')
     .aggregate([{ $sample: { size: 1 } }])
     .toArray()
     .then((data) => {
-      res.json(data[0]);
+      return res.json(data[0]);
     })
     .catch((err) => {
-      res.status(500).json({ message: err });
+      return res.status(500).json({ message: err });
     });
 });
 
 router.get('/departments/:id', (req, res) => {
-  return req.db
+  req.db
     .collection('departments')
     .findOne({ _id: ObjectId(req.params.id) })
     .then((data) => {
-      if (!data) res.status(404).json({ message: 'Not found' });
-      else res.json(data);
+      if (!data) return res.status(404).json({ message: 'Not found' });
+      else return res.json(data);
     })
     .catch((err) => {
-      res.status(500).json({ message: err });
+      return res.status(500).json({ message: err });
     });
 });
 
@@ -52,10 +52,10 @@ router.post('/departments', (req, res) => {
     .collection('departments')
     .insertOne({ name: name })
     .then(() => {
-      res.json({ message: 'OK' });
+      return res.json({ message: 'OK' });
     })
     .catch((err) => {
-      res.status(500).json({ message: err });
+      return res.status(500).json({ message: err });
     });
 });
 

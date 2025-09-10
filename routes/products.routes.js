@@ -3,9 +3,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./../db');
+const { ObjectId } = require('mongodb');
 
 router.get('/products', (req, res) => {
-  return req.db
+  req.db
     .collection('products')
     .find()
     .toArray()
@@ -18,20 +19,29 @@ router.get('/products', (req, res) => {
 });
 
 router.get('/products/random', (req, res) => {
-  return req.db
+  req.db
     .collection('products')
     .aggregate([{ $sample: { size: 1 } }])
     .toArray()
     .then((data) => {
-      res.json(data[0]);
+      return res.json(data[0]);
     })
     .catch((err) => {
-      res.status(500).json({ message: err });
+      return res.status(500).json({ message: err });
     });
 });
 
 router.get('/products/:id', (req, res) => {
-  res.json(db.products.find((item) => item.id == req.params.id));
+  req.db
+    .collection('products')
+    .findOne({ _id: ObjectId(req.params.id) })
+    .then((data) => {
+      if (!data) return res.status(404).json({ message: 'Not found' });
+      else return res.json(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({ message: err });
+    });
 });
 
 router.post('/products', (req, res) => {

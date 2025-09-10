@@ -3,7 +3,7 @@ const router = express.Router();
 const { ObjectId } = require('mongodb');
 
 router.get('/employees', (req, res) => {
-  return req.db
+  req.db
     .collection('employees')
     .find()
     .toArray()
@@ -16,15 +16,15 @@ router.get('/employees', (req, res) => {
 });
 
 router.get('/employees/random', (req, res) => {
-  return req.db
+  req.db
     .collection('employees')
     .aggregate([{ $sample: { size: 1 } }])
     .toArray()
     .then((data) => {
-      res.json(data[0]);
+      return res.json(data[0]);
     })
     .catch((err) => {
-      res.status(500).json({ message: err });
+      return res.status(500).json({ message: err });
     });
 });
 
@@ -50,14 +50,14 @@ router.post('/employees', (req, res) => {
     return res.status(400).json({ error: 'Missing required data in request' });
   }
 
-  return req.db
+  req.db
     .collection('employees')
     .insertOne({ firstName, lastName })
     .then(() => {
-      res.json({ message: 'OK' });
+      return res.json({ message: 'OK' });
     })
     .catch((err) => {
-      res.status(500).json({ message: err });
+      return res.status(500).json({ message: err });
     });
 });
 
