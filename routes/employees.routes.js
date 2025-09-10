@@ -17,7 +17,16 @@ router.get('/employees', (req, res) => {
 });
 
 router.get('/employees/random', (req, res) => {
-  res.json(db.employees[Math.floor(Math.random() * db.length)]);
+  return req.db
+    .collection('employees')
+    .aggregate([{ $sample: { size: 1 } }])
+    .toArray()
+    .then((data) => {
+      res.json(data[0]);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err });
+    });
 });
 
 router.get('/employees/:id', (req, res) => {
