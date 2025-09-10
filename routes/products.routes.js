@@ -81,8 +81,15 @@ router.put('/products/:id', (req, res) => {
 });
 
 router.delete('/products/:id', (req, res) => {
-  db = db.products.filter((item) => item.id != req.params.id);
-  res.json({ message: 'OK' });
+  req.db
+    .collection('products')
+    .deleteOne({ _id: ObjectId(req.params.id) })
+    .then(() => {
+      return res.json({ message: 'OK' });
+    })
+    .catch((err) => {
+      return res.status(500).json({ message: err });
+    });
 });
 
 module.exports = router;
