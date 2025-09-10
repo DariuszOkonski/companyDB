@@ -5,7 +5,7 @@ const { ObjectId } = require('mongodb');
 
 router.get('/employees', (req, res) => {
   req.db
-    .collection('departments')
+    .collection('employees')
     .find()
     .toArray()
     .then((data) => {
@@ -31,7 +31,7 @@ router.get('/employees/random', (req, res) => {
 
 router.get('/employees/:id', (req, res) => {
   req.db
-    .collection('departments')
+    .collection('employees')
     .findOne({ _id: ObjectId(req.params.id) })
     .then((data) => {
       if (!data) {
@@ -51,16 +51,36 @@ router.post('/employees', (req, res) => {
     return res.status(400).json({ error: 'Missing required data in request' });
   }
 
-  db.employees.push({ id: 3, firstName, lastName });
-  res.json({ message: 'OK' });
+  return req.db
+    .collection('employees')
+    .insertOne({ firstName, lastName })
+    .then(() => {
+      res.json({ message: 'OK' });
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err });
+    });
 });
 
 router.put('/employees/:id', (req, res) => {
   const { firstName, lastName } = req.body;
-  db = db.employees.map((item) =>
-    item.id == req.params.id ? { ...item, firstName, lastName } : item
-  );
-  res.json({ message: 'OK' });
+
+  if (!firstName || !lastName) {
+    return res.status(400).json({ error: 'Missing required data in request' });
+  }
+
+  req.db
+    .collection('employees')
+    .updateOne(
+      { _id: ObjectId(req.params.id) },
+      { $set: { firstName, lastName } }
+    )
+    .then(() => {
+      return res.json({ message: 'OK' });
+    })
+    .catch((err) => {
+      return res.status(500).json({ message: err });
+    });
 });
 
 router.delete('/employees/:id', (req, res) => {
