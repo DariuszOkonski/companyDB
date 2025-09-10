@@ -69,10 +69,15 @@ router.put('/products/:id', (req, res) => {
     return res.status(400).json({ message: 'Missing data' });
   }
 
-  db = db.products.map((item) =>
-    item.id == req.params.id ? { ...item, name, client } : item
-  );
-  res.json({ message: 'OK' });
+  req.db
+    .collection('products')
+    .updateOne({ _id: ObjectId(req.params.id) }, { $set: { name, client } })
+    .then(() => {
+      return res.json({ message: 'OK' });
+    })
+    .catch((err) => {
+      return res.status(500).json({ message: err });
+    });
 });
 
 router.delete('/products/:id', (req, res) => {
