@@ -53,10 +53,20 @@ router.post('/departments', (req, res) => {
 
 router.put('/departments/:id', (req, res) => {
   const { name } = req.body;
-  db = db.departments.map((item) =>
-    item.id == req.params.id ? { ...item, name } : item
-  );
-  res.json({ message: 'OK' });
+
+  if (!name) {
+    return res.status(400).json({ message: 'Missing data' });
+  }
+
+  req.db
+    .collection('departments')
+    .updateOne({ _id: ObjectId(req.params.id) }, { $set: { name: name } })
+    .then(() => {
+      return res.json({ message: 'OK' });
+    })
+    .catch((err) => {
+      return res.status(500).json({ message: err });
+    });
 });
 
 router.delete('/departments/:id', (req, res) => {
