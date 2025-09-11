@@ -95,16 +95,23 @@ router.put('/employees/:id', async (req, res) => {
   }
 });
 
-router.delete('/employees/:id', (req, res) => {
-  req.db
-    .collection('employees')
-    .deleteOne({ _id: ObjectId(req.params.id) })
-    .then(() => {
-      return res.json({ message: 'OK' });
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
+router.delete('/employees/:id', async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid department ID' });
+    }
+
+    const employee = await Employee.findById(req.params.id);
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Not Found' });
+    }
+
+    await Employee.deleteOne({ _id: req.params.id });
+    return res.json({ message: 'OK' });
+  } catch (error) {
+    return res.status(500).json({ message: err });
+  }
 });
 
 module.exports = router;
