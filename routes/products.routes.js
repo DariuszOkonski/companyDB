@@ -15,29 +15,37 @@ router.get('/products', async (req, res) => {
 });
 
 router.get('/products/random', async (req, res) => {
-  req.db
-    .collection('products')
-    .aggregate([{ $sample: { size: 1 } }])
-    .toArray()
-    .then((data) => {
-      return res.json(data[0]);
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
+  try {
+    const count = await Product.countDocuments();
+    const rand = Math.floor(Math.random() * count);
+    const product = await Product.findOne().skip(rand);
+
+    if (!product) {
+      return res.status(404).json({ msg: 'Not found' });
+    }
+
+    return res.json(product);
+  } catch (error) {
+    return res.status(500).json({ message: err });
+  }
 });
 
 router.get('/products/:id', async (req, res) => {
-  req.db
-    .collection('products')
-    .findOne({ _id: ObjectId(req.params.id) })
-    .then((data) => {
-      if (!data) return res.status(404).json({ message: 'Not found' });
-      else return res.json(data);
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid department ID' });
+    }
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Not Found' });
+    }
+
+    return res.json(product);
+  } catch (error) {
+    return res.status(500).json({ message: err });
+  }
 });
 
 router.post('/products', async (req, res) => {
