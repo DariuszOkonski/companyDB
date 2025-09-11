@@ -49,39 +49,49 @@ router.get('/products/:id', async (req, res) => {
 });
 
 router.post('/products', async (req, res) => {
-  const { name, client } = req.body;
+  try {
+    const { name, client } = req.body;
 
-  if (!name || !client) {
-    return res.status(400).json({ message: 'Missing data' });
+    if (!name || !client) {
+      return res.status(400).json({ message: 'Missing data' });
+    }
+
+    const newProduct = new Product({ name, client });
+    await newProduct.save();
+    return res.json({ message: 'OK' });
+  } catch (error) {
+    return res.status(500).json({ message: err });
   }
-
-  return req.db
-    .collection('products')
-    .insertOne({ name, client })
-    .then(() => {
-      return res.json({ message: 'OK' });
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
 });
 
 router.put('/products/:id', async (req, res) => {
-  const { name, client } = req.body;
+  try {
+    const { name, client } = req.body;
 
-  if (!name || !client) {
-    return res.status(400).json({ message: 'Missing data' });
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid department ID' });
+    }
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Not Found' });
+    }
+
+    await Product.updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          name: name ?? product.name,
+          client: client ?? product.client,
+        },
+      }
+    );
+
+    return res.json({ message: 'OK' });
+  } catch (error) {
+    return res.status(500).json({ message: err });
   }
-
-  req.db
-    .collection('products')
-    .updateOne({ _id: ObjectId(req.params.id) }, { $set: { name, client } })
-    .then(() => {
-      return res.json({ message: 'OK' });
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
 });
 
 router.delete('/products/:id', async (req, res) => {
