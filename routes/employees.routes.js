@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 router.get('/employees', async (req, res) => {
   try {
-    const employees = await Employee.find();
+    const employees = await Employee.find().populate('department');
     return res.json(employees);
   } catch (error) {
     return res.status(500).json({ message: err });
@@ -16,7 +16,7 @@ router.get('/employees/random', async (req, res) => {
   try {
     const count = await Employee.countDocuments();
     const rand = Math.floor(Math.random() * count);
-    const employee = await Employee.findOne().skip(rand);
+    const employee = await Employee.findOne().skip(rand).populate('department');
 
     if (!employee) {
       return res.status(404).json({ msg: 'Not found' });
@@ -34,7 +34,9 @@ router.get('/employees/:id', async (req, res) => {
       return res.status(400).json({ message: 'Invalid department ID' });
     }
 
-    const employee = await Employee.findById(req.params.id);
+    const employee = await Employee.findById(req.params.id).populate(
+      'department'
+    );
 
     if (!employee) {
       return res.status(404).json({ message: 'Not Found' });
