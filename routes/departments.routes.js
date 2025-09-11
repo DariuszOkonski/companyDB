@@ -1,103 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const Department = require('../model/department.model');
-const mongoose = require('mongoose');
+const DepartmentController = require('../controllers/departments.controller');
 
-router.get('/departments', async (req, res) => {
-  try {
-    const department = await Department.find();
-    return res.json(department);
-  } catch (error) {
-    return res.status(500).json({ message: err });
-  }
-});
+router.get('/departments', DepartmentController.getAll);
 
-router.get('/departments/random', async (req, res) => {
-  try {
-    const count = await Department.countDocuments();
-    const rand = Math.floor(Math.random() * count);
-    const department = await Department.findOne().skip(rand);
+router.get('/departments/random', DepartmentController.getRandom);
 
-    if (!department) {
-      return res.status(404).json({ msg: 'Not found' });
-    }
+router.get('/departments/:id', DepartmentController.getDepartment);
 
-    return res.json(department);
-  } catch (error) {
-    return res.status(500).json({ message: err });
-  }
-});
+router.post('/departments', DepartmentController.createDepartment);
 
-router.get('/departments/:id', async (req, res) => {
-  try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: 'Invalid department ID' });
-    }
+router.put('/departments/:id', DepartmentController.updatedDepartment);
 
-    const department = await Department.findById(req.params.id);
-
-    if (!department) {
-      return res.status(404).json({ message: 'Not found' });
-    }
-
-    return res.json(department);
-  } catch (error) {
-    return res.status(500).json({ message: err });
-  }
-});
-
-router.post('/departments', async (req, res) => {
-  try {
-    const { name } = req.body;
-
-    if (!name) {
-      return res.status(400).json({ message: 'Missing data' });
-    }
-
-    const newDepartment = new Department({ name });
-    await newDepartment.save();
-    return res.json(newDepartment);
-  } catch (error) {
-    return res.status(500).json({ message: err });
-  }
-});
-
-router.put('/departments/:id', async (req, res) => {
-  try {
-    const { name } = req.body;
-
-    if (!name) {
-      return res.status(400).json({ message: 'Missing data' });
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: 'Invalid department ID' });
-    }
-    await Department.updateOne({ _id: req.params.id }, { $set: { name } });
-
-    const updatedDepartment = await Department.findById(req.params.id);
-    return res.json(updatedDepartment);
-  } catch (error) {
-    return res.status(500).json({ message: error });
-  }
-});
-
-router.delete('/departments/:id', async (req, res) => {
-  try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: 'Invalid department ID' });
-    }
-
-    const department = await Department.findById(req.params.id);
-    if (department) {
-      await Department.deleteOne({ _id: req.params.id });
-      return res.json(department);
-    }
-
-    return res.status(404).json({ message: 'Not found' });
-  } catch (error) {
-    return res.status(500).json({ message: err });
-  }
-});
+router.delete('/departments/:id', DepartmentController.deleteDepartment);
 
 module.exports = router;
