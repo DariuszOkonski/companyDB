@@ -30,6 +30,10 @@ router.get('/departments/random', async (req, res) => {
 
 router.get('/departments/:id', async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid department ID' });
+    }
+
     const department = await Department.findById(req.params.id);
 
     if (!department) {
@@ -76,16 +80,22 @@ router.put('/departments/:id', async (req, res) => {
   }
 });
 
-router.delete('/departments/:id', (req, res) => {
-  req.db
-    .collection('departments')
-    .deleteOne({ _id: ObjectId(req.params.id) })
-    .then(() => {
+router.delete('/departments/:id', async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid department ID' });
+    }
+
+    const department = await Department.findById(req.params.id);
+    if (department) {
+      await Department.deleteOne({ _id: req.params.id });
       return res.json({ message: 'OK' });
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
+    }
+
+    return res.status(404).json({ message: 'Not found' });
+  } catch (error) {
+    return res.status(500).json({ message: err });
+  }
 });
 
 module.exports = router;
