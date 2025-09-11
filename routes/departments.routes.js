@@ -56,7 +56,7 @@ router.post('/departments', async (req, res) => {
 
     const newDepartment = new Department({ name });
     await newDepartment.save();
-    return res.json({ message: 'OK' });
+    return res.json(newDepartment);
   } catch (error) {
     return res.status(500).json({ message: err });
   }
@@ -74,7 +74,9 @@ router.put('/departments/:id', async (req, res) => {
       return res.status(400).json({ message: 'Invalid department ID' });
     }
     await Department.updateOne({ _id: req.params.id }, { $set: { name } });
-    return res.json({ message: 'OK' });
+
+    const updatedDepartment = await Department.findById(req.params.id);
+    return res.json(updatedDepartment);
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -89,7 +91,7 @@ router.delete('/departments/:id', async (req, res) => {
     const department = await Department.findById(req.params.id);
     if (department) {
       await Department.deleteOne({ _id: req.params.id });
-      return res.json({ message: 'OK' });
+      return res.json(department);
     }
 
     return res.status(404).json({ message: 'Not found' });
