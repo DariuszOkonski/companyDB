@@ -64,25 +64,35 @@ router.post('/employees', async (req, res) => {
   }
 });
 
-router.put('/employees/:id', (req, res) => {
-  const { firstName, lastName } = req.body;
+router.put('/employees/:id', async (req, res) => {
+  try {
+    const { firstName, lastName, department } = req.body;
 
-  if (!firstName || !lastName) {
-    return res.status(400).json({ error: 'Missing required data in request' });
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid department ID' });
+    }
+
+    const employee = await Employee.findById(req.params.id);
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Not Found' });
+    }
+
+    await Employee.updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          firstName: firstName ?? employee.firstName,
+          lastName: lastName ?? employee.lastName,
+          department: department ?? employee.department,
+        },
+      }
+    );
+
+    return res.json({ message: 'OK' });
+  } catch (error) {
+    return res.status(500).json({ message: err });
   }
-
-  req.db
-    .collection('employees')
-    .updateOne(
-      { _id: ObjectId(req.params.id) },
-      { $set: { firstName, lastName } }
-    )
-    .then(() => {
-      return res.json({ message: 'OK' });
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
 });
 
 router.delete('/employees/:id', (req, res) => {
