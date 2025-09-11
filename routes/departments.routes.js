@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { ObjectId } = require('mongodb');
 const Department = require('../model/department.model');
+const mongoose = require('mongoose');
 
 router.get('/departments', async (req, res) => {
   try {
@@ -58,22 +58,22 @@ router.post('/departments', async (req, res) => {
   }
 });
 
-router.put('/departments/:id', (req, res) => {
-  const { name } = req.body;
+router.put('/departments/:id', async (req, res) => {
+  try {
+    const { name } = req.body;
 
-  if (!name) {
-    return res.status(400).json({ message: 'Missing data' });
+    if (!name) {
+      return res.status(400).json({ message: 'Missing data' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid department ID' });
+    }
+    await Department.updateOne({ _id: req.params.id }, { $set: { name } });
+    return res.json({ message: 'OK' });
+  } catch (error) {
+    return res.status(500).json({ message: error });
   }
-
-  req.db
-    .collection('departments')
-    .updateOne({ _id: ObjectId(req.params.id) }, { $set: { name: name } })
-    .then(() => {
-      return res.json({ message: 'OK' });
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
 });
 
 router.delete('/departments/:id', (req, res) => {
