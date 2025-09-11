@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { ObjectId } = require('mongodb');
 const Employee = require('../model/employee.model');
 const mongoose = require('mongoose');
 
@@ -13,17 +12,20 @@ router.get('/employees', async (req, res) => {
   }
 });
 
-router.get('/employees/random', (req, res) => {
-  req.db
-    .collection('employees')
-    .aggregate([{ $sample: { size: 1 } }])
-    .toArray()
-    .then((data) => {
-      return res.json(data[0]);
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
+router.get('/employees/random', async (req, res) => {
+  try {
+    const count = await Employee.countDocuments();
+    const rand = Math.floor(Math.random() * count);
+    const employee = await Employee.findOne().skip(rand);
+
+    if (!employee) {
+      return res.status(404).json({ msg: 'Not found' });
+    }
+
+    return res.json(employee);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
 });
 
 router.get('/employees/:id', (req, res) => {
