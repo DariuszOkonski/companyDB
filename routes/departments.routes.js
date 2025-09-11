@@ -28,17 +28,18 @@ router.get('/departments/random', async (req, res) => {
   }
 });
 
-router.get('/departments/:id', (req, res) => {
-  req.db
-    .collection('departments')
-    .findOne({ _id: ObjectId(req.params.id) })
-    .then((data) => {
-      if (!data) return res.status(404).json({ message: 'Not found' });
-      else return res.json(data);
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
+router.get('/departments/:id', async (req, res) => {
+  try {
+    const department = await Department.findById(req.params.id);
+
+    if (!department) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+
+    return res.json(department);
+  } catch (error) {
+    return res.status(500).json({ message: err });
+  }
 });
 
 router.post('/departments', async (req, res) => {
