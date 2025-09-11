@@ -1,4 +1,3 @@
-const express = require('express');
 const Employee = require('../model/employee.model');
 const mongoose = require('mongoose');
 
