@@ -3,30 +3,29 @@ const router = express.Router();
 const { ObjectId } = require('mongodb');
 const Department = require('../model/department.model');
 
-router.get('/departments', (req, res) => {
-  req.db
-    .collection('departments')
-    .find()
-    .toArray()
-    .then((data) => {
-      return res.json(data);
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
+router.get('/departments', async (req, res) => {
+  try {
+    const department = await Department.find();
+    return res.json(department);
+  } catch (error) {
+    return res.status(500).json({ message: err });
+  }
 });
 
-router.get('/departments/random', (req, res) => {
-  req.db
-    .collection('departments')
-    .aggregate([{ $sample: { size: 1 } }])
-    .toArray()
-    .then((data) => {
-      return res.json(data[0]);
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
+router.get('/departments/random', async (req, res) => {
+  try {
+    const count = await Department.countDocuments();
+    const rand = Math.floor(Math.random() * count);
+    const department = await Department.findOne().skip(rand);
+
+    if (!department) {
+      return res.status(404).json({ msg: 'Not found' });
+    }
+
+    return res.json(department);
+  } catch (error) {
+    return res.status(500).json({ message: err });
+  }
 });
 
 router.get('/departments/:id', (req, res) => {
