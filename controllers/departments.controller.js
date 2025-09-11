@@ -61,7 +61,7 @@ const createDepartment = async (req, res) => {
   }
 };
 
-const updatedDepartment = async (req, res) => {
+const updateDepartment = async (req, res) => {
   try {
     const { name } = req.body;
 
@@ -104,6 +104,6 @@ module.exports = {
   getRandom,
   getDepartment,
   createDepartment,
-  updatedDepartment,
+  updateDepartment,
   deleteDepartment,
 };

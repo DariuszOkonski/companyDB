@@ -10,7 +10,7 @@ router.get('/departments/:id', DepartmentController.getDepartment);
 
 router.post('/departments', DepartmentController.createDepartment);
 
-router.put('/departments/:id', DepartmentController.updatedDepartment);
+router.put('/departments/:id', DepartmentController.updateDepartment);
 
 router.delete('/departments/:id', DepartmentController.deleteDepartment);
 
