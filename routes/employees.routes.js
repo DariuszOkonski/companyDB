@@ -46,22 +46,22 @@ router.get('/employees/:id', async (req, res) => {
   }
 });
 
-router.post('/employees', (req, res) => {
-  const { firstName, lastName } = req.body;
+router.post('/employees', async (req, res) => {
+  try {
+    const { firstName, lastName, department } = req.body;
 
-  if (!firstName || !lastName) {
-    return res.status(400).json({ error: 'Missing required data in request' });
+    if (!firstName || !lastName || !department) {
+      return res
+        .status(400)
+        .json({ error: 'Missing required data in request' });
+    }
+
+    const newEmployee = new Employee({ firstName, lastName, department });
+    await newEmployee.save();
+    return res.json({ message: 'OK' });
+  } catch (error) {
+    return res.status(500).json({ message: err });
   }
-
-  req.db
-    .collection('employees')
-    .insertOne({ firstName, lastName })
-    .then(() => {
-      return res.json({ message: 'OK' });
-    })
-    .catch((err) => {
-      return res.status(500).json({ message: err });
-    });
 });
 
 router.put('/employees/:id', (req, res) => {
