@@ -1,4 +1,3 @@
-// const { describe, it } = require('mocha');
 const { expect } = require('chai');
 const Department = require('../department.model.js');
 const mongoose = require('mongoose');
