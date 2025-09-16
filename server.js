@@ -25,10 +25,14 @@ app.use((req, res) => {
   res.status(404).send({ message: 'Not found...' });
 });
 
-mongoose.connect('mongodb://0.0.0.0:27017/companyDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+// mongoose.connect('mongodb://0.0.0.0:27017/companyDB', {
+mongoose.connect(
+  'mongodb+srv://darek200180_db_user:J2JOckPwXfY2vN2U@companydb.y6rjd6d.mongodb.net/?retryWrites=true&w=majority&appName=companyDB',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 const db = mongoose.connection;
 db.once('open', () => {
   console.log('Connected to the database...');
