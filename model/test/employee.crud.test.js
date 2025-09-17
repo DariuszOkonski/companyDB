@@ -67,4 +67,51 @@ describe('Employee', () => {
       expect(savedEmployee).to.not.be.null;
     });
   });
+
+  describe('Updating data', () => {
+    beforeEach(async () => {
+      const testDepOne = new Employee({
+        firstName: 'John',
+        lastName: 'Doe',
+        department: '68bd788812a2d1ab0ddd569f',
+      });
+      await testDepOne.save();
+
+      const testDepTwo = new Employee({
+        firstName: 'Amanda',
+        lastName: 'Doe',
+        department: '68c10776f7b18cebe5b78c70',
+      });
+      await testDepTwo.save();
+    });
+
+    afterEach(async () => {
+      await Employee.deleteMany();
+    });
+
+    it('should properly update one document with updateOne method', async () => {
+      await Employee.updateOne(
+        { firstName: 'John' },
+        { $set: { firstName: '=John=' } }
+      );
+      const updatedEmployee = await Employee.findOne({ firstName: '=John=' });
+      expect(updatedEmployee).to.not.be.null;
+    });
+
+    it('should properly update one document with save method', async () => {
+      const employee = await Employee.findOne({ firstName: 'John' });
+      employee.firstName = '=John=';
+      await employee.save();
+
+      const updatedEmployee = await Employee.findOne({ firstName: '=John=' });
+      expect(updatedEmployee).to.not.be.null;
+    });
+
+    it('should properly update multiple documents with updateMany method', async () => {
+      await Employee.updateMany({}, { $set: { firstName: 'Updated!' } });
+      const employees = await Employee.find();
+      expect(employees[0].firstName).to.be.equal('Updated!');
+      expect(employees[1].firstName).to.be.equal('Updated!');
+    });
+  });
 });
