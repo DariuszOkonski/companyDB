@@ -114,4 +114,38 @@ describe('Employee', () => {
       expect(employees[1].firstName).to.be.equal('Updated!');
     });
   });
+
+  describe('Removing data', () => {
+    beforeEach(async () => {
+      const testDepOne = new Employee({
+        firstName: 'John',
+        lastName: 'Doe',
+        department: '68bd788812a2d1ab0ddd569f',
+      });
+      await testDepOne.save();
+
+      const testDepTwo = new Employee({
+        firstName: 'Amanda',
+        lastName: 'Doe',
+        department: '68c10776f7b18cebe5b78c70',
+      });
+      await testDepTwo.save();
+    });
+
+    afterEach(async () => {
+      await Employee.deleteMany();
+    });
+
+    it('should properly remove one document with deleteOne method', async () => {
+      await Employee.deleteOne({ firstName: 'John' });
+      const removedEmployee = await Employee.findOne({ firstName: 'John' });
+      expect(removedEmployee).to.be.null;
+    });
+
+    it('should properly remove multiple documents with deleteMany method', async () => {
+      await Employee.deleteMany();
+      const employees = await Employee.find();
+      expect(employees.length).to.be.equal(0);
+    });
+  });
 });
