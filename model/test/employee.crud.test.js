@@ -49,4 +49,22 @@ describe('Employee', () => {
       expect(employee.firstName).to.be.equal('John');
     });
   });
+
+  describe('Creating data', () => {
+    after(async () => {
+      await Employee.deleteMany();
+    });
+
+    it('should insert new document with insertOne method', async () => {
+      const employee = new Employee({
+        firstName: 'John',
+        lastName: 'Doe',
+        department: '68c10776f7b18cebe5b78c70',
+      });
+      employee.save();
+
+      const savedEmployee = Employee.findOne({ firstName: 'John' });
+      expect(savedEmployee).to.not.be.null;
+    });
+  });
 });
