@@ -26,13 +26,29 @@ app.use((req, res) => {
 });
 
 // mongoose.connect('mongodb://0.0.0.0:27017/companyDB', {
-mongoose.connect(
-  'mongodb+srv://darek200180_db_user:J2JOckPwXfY2vN2U@companydb.y6rjd6d.mongodb.net/?retryWrites=true&w=majority&appName=companyDB',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+// mongoose.connect(
+//   'mongodb+srv://darek200180_db_user:J2JOckPwXfY2vN2U@companydb.y6rjd6d.mongodb.net/?retryWrites=true&w=majority&appName=companyDB',
+//   {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   }
+// );
+
+const NODE_ENV = process.env.NODE_ENV;
+let dbUri = '';
+
+if (NODE_ENV === 'production')
+  dbUri =
+    'mongodb+srv://darek200180_db_user:J2JOckPwXfY2vN2U@companydb.y6rjd6d.mongodb.net/?retryWrites=true&w=majority&appName=companyDB';
+else if (NODE_ENV === 'test') dbUri = 'mongodb://0.0.0.0:27017/companyDBtest';
+else dbUri = 'mongodb://0.0.0.0:27017/companyDB';
+
+console.group('MongoDB config');
+console.log('dbUri: ', dbUri);
+console.log('NODE_ENV: ', NODE_ENV);
+console.groupEnd();
+
+mongoose.connect(dbUri, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.once('open', () => {
   console.log('Connected to the database...');
