@@ -3,9 +3,9 @@ const Department = require('../department.model.js');
 const mongoose = require('mongoose');
 
 describe('Department', () => {
-  after(() => {
-    mongoose.model = {};
-  });
+  // after(() => {
+  //   mongoose.model = {};
+  // });
 
   it('should throw an error if no name arg', () => {
     const department = new Department({});
