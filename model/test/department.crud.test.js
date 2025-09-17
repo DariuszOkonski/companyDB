@@ -43,4 +43,25 @@ describe('Department', () => {
       expect(department.name).to.be.equal(expectedName);
     });
   });
+
+  describe('Creating data', () => {
+    after(async () => {
+      await Department.deleteMany();
+    });
+
+    it('should insert new document with insertOne method v1', async () => {
+      const department = new Department({ name: 'Department #1' });
+      await department.save();
+      const savedDepartment = await Department.findOne({
+        name: 'Department #1',
+      });
+      expect(savedDepartment).to.not.be.null;
+    });
+
+    it('should insert new document with insertOne method v2', async () => {
+      const department = new Department({ name: 'Department #1' });
+      await department.save();
+      expect(department.isNew).to.be.false;
+    });
+  });
 });
